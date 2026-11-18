@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A bouquet for you, Princess</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#fff0f4;--bg2:#f6dcff;--ink:#4a1d3f;--soft:#7d4a6f;--card:rgba(255,255,255,.72);--accent:#d6336c;--paper:#f3d9ff;--paper2:#ffc9dc;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#2a1233;--bg2:#4b1d4f;--ink:#ffe9f1;--soft:#e2b8d0;--card:rgba(255,255,255,.08);--accent:#ff8fb3;--paper:#5c2d6e;--paper2:#8a3a73}}
+:root[data-theme="dark"]{--bg1:#2a1233;--bg2:#4b1d4f;--ink:#ffe9f1;--soft:#e2b8d0;--card:rgba(255,255,255,.08);--accent:#ff8fb3;--paper:#5c2d6e;--paper2:#8a3a73}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:radial-gradient(120% 90% at 50% 0%,var(--bg2),var(--bg1));color:var(--ink);font-family:Nunito,system-ui,sans-serif;overflow-x:hidden}
+main{max-width:520px;margin:0 auto;padding:28px 20px 40px;text-align:center;position:relative;z-index:2}
+h1{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:600;font-size:clamp(2.4rem,9vw,3.4rem);line-height:1.05;margin:8px 0 10px}
+.sub{color:var(--soft);margin:0 auto;max-width:34ch;line-height:1.6}
+button{font:inherit;cursor:pointer}
+.open{margin-top:22px;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px 30px;font-weight:600;font-size:1.05rem;box-shadow:0 8px 24px rgba(214,51,108,.35)}
+.open:focus-visible,.share:focus-visible,.fl:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+#stage{width:100%;max-width:400px;margin:6px auto 0;display:block;overflow:visible}
+.fl{cursor:pointer;transition:transform 1.1s cubic-bezier(.2,1.3,.4,1);outline:none}
+.fl .bump{transition:transform .35s}
+.fl:hover .bump,.fl.pop .bump{transform:scale(1.12)}
+.stem{stroke:#3a9566;stroke-width:4;fill:none;stroke-linecap:round;stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1.2s ease}
+.leaf{fill:#4fae7b;opacity:0;transition:opacity .8s 1s}
+.bloomed .stem{stroke-dashoffset:0}.bloomed .leaf{opacity:.95}
+.wish{min-height:7.5em;margin:14px auto 0;max-width:40ch;background:var(--card);backdrop-filter:blur(6px);border-radius:22px;padding:18px 20px;line-height:1.6;border:1px solid rgba(214,51,108,.18)}
+.wish b{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.5rem;font-style:italic;display:block;margin-bottom:4px;color:var(--accent)}
+.count{margin:10px 0 0;color:var(--soft);font-size:.9rem}
+.final{opacity:0;transform:translateY(10px);transition:all .9s;margin-top:22px;pointer-events:none}
+.final.on{opacity:1;transform:none;pointer-events:auto}
+.final p{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.5rem;font-style:italic;line-height:1.4;margin:0 0 16px}
+.share{background:transparent;color:var(--accent);border:2px solid var(--accent);border-radius:999px;padding:10px 22px;font-weight:600}
+.hide{display:none}.back{opacity:0;transition:opacity 1.2s .8s}.bloomed .back{opacity:1}#bq{transform-box:view-box;transform-origin:200px 430px}.sway{animation:sway 5s ease-in-out infinite alternate}@keyframes sway{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
+.petal{position:fixed;top:-30px;width:14px;height:18px;border-radius:70% 0 70% 0;pointer-events:none;z-index:1;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(540deg);opacity:.6}}
+@media (prefers-reduced-motion:reduce){.fl,.stem,.leaf{transition:none}.sway{animation:none}.petal{display:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Happy Princess Day</h1>
+  <p class="sub" id="sub">Distance can’t carry real flowers, so I made you a bouquet that blooms anywhere.</p>
+  <button class="open" id="open">Unwrap your bouquet</button>
+
+  <svg id="stage" viewBox="0 0 400 560" role="group" aria-label="A bouquet of seven flowers. Tap each flower to read a wish.">
+    <defs>
+      <linearGradient id="pw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--paper)"/><stop offset="1" stop-color="var(--paper2)"/></linearGradient>
+    </defs>
+    <g id="bq"><g id="back" class="back"></g><g id="stems"></g><g id="flowers"></g></g>
+    <g id="wrap" style="opacity:0;transition:opacity .6s">
+      <path d="M72 330 Q200 300 328 330 L216 545 Q200 552 184 545Z" fill="url(#pw)" stroke="rgba(0,0,0,.08)"/>
+      <path d="M120 345 L200 540 M280 345 L200 540" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none"/>
+      <g transform="translate(200 425)"><path d="M0 0 C-40 -34 -62 -6 -48 14 C-40 26 -10 12 0 0Z M0 0 C40 -34 62 -6 48 14 C40 26 10 12 0 0Z" fill="#d6336c"/><path d="M0 0 L-24 52 L-8 44 L0 60 L8 44 L24 52Z" fill="#b82258"/><circle r="9" fill="#ff8fb3"/></g>
+    </g>
+  </svg>
+
+  <div class="wish" id="wish" aria-live="polite"><span style="color:var(--soft)">Tap a flower to read what it holds for you.</span></div>
+  <p class="count" id="count"></p>
+
+  <div class="final" id="final">
+    <p>You are the kind of person every day is a little brighter for. Wherever you are, you are loved from here.</p>
+    <button class="share" id="share">Send this bouquet to someone</button>
+  </div>
+</main>
+
+<script>
+(function(){
+var NS="http://www.w3.org/2000/svg",seed=7;
+function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
+var F=[
+ {k:"rose",x:200,y:176,r:52,tilt:0,c:["#ff6f98","#a30d3a"],t:"Radiant",w:"Your smile changes the temperature of a room. Never dim it for anyone."},
+ {k:"rose",x:118,y:240,r:44,tilt:-10,c:["#ffc3b3","#e0505f"],t:"Brave",w:"You chased your dreams far from home. That is real courage, and it shows."},
+ {k:"rose",x:284,y:238,r:44,tilt:12,c:["#fff1e4","#ee86a6"],t:"Cherished",w:"Someone is always thinking of you, no matter how many time zones lie between."},
+ {k:"tulip",x:138,y:120,tilt:-13,c:["#ffc6df","#d8337f"],t:"Joyful",w:"May this year hand you small, ordinary joys: good coffee, warm calls, easy laughter."},
+ {k:"tulip",x:264,y:112,tilt:12,c:["#f1e0ff","#8548d6"],t:"Strong",w:"On hard days, remember how many hard days you have already walked through."},
+ {k:"daisy",x:200,y:270,r:30,tilt:6,t:"Graceful",w:"You carry kindness so naturally that people feel safer around you."},
+ {k:"daisy",x:76,y:310,r:25,tilt:-8,t:"Home",w:"Home is not a place. It is the people who carry you. I carry you."}
+];
+function el(t,a,p){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function mix(a,b,t){function n(x){return x.length==4?"#"+x[1]+x[1]+x[2]+x[2]+x[3]+x[3]:x}a=n(a);b=n(b);function h(x,i){return parseInt(x.substr(1+i*2,2),16)}var o="#";for(var i=0;i<3;i++){var v=Math.round(h(a,i)+(h(b,i)-h(a,i))*t).toString(16);o+=(v.length<2?"0":"")+v}return o}
+var defs=document.querySelector("defs"),back=document.getElementById("back"),stems=document.getElementById("stems"),fl=document.getElementById("flowers"),gid=0;
+function grad(stops,v,rad){var id="g"+(gid++),g=el(rad?"radialGradient":"linearGradient",rad?{id:id}:{id:id,x1:v?0:0,y1:v?1:0,x2:v?0:1,y2:v?0:0},defs);
+ stops.forEach(function(s){el("stop",{offset:s[0],"stop-color":s[1],"stop-opacity":s[2]==null?1:s[2]},g)});return "url(#"+id+")"}
+var SHADE=grad([[.6,"#000",0],[1,"#000",.14]],0,1),LEAF=grad([[0,"#2b8559"],[.55,"#4fae7b"],[1,"#7cc99c"]]);
+function leaf(p,x,y,len,ang,wid,fill){var g=el("g",{transform:"translate("+x+" "+y+") rotate("+ang+")"},p);
+ el("path",{d:"M0 0C"+wid+" "+(-len*.22)+" "+wid*.95+" "+(-len*.76)+" 0 "+(-len)+"C"+(-wid*.95)+" "+(-len*.76)+" "+(-wid)+" "+(-len*.22)+" 0 0Z",fill:fill||LEAF,stroke:"#2b7a52","stroke-opacity":.4,"stroke-width":.8},g);
+ el("path",{d:"M0 -2L0 "+(-len*.92),stroke:"#d6f5e1","stroke-opacity":.5,"stroke-width":1.2,fill:"none"},g);
+ for(var i=1;i<6;i++){var yy=-len*i*.15,xx=wid*(.62-Math.abs(i-2.8)*.1);el("path",{d:"M0 "+yy+"L"+xx+" "+(yy-len*.1)+"M0 "+yy+"L"+(-xx)+" "+(yy-len*.1),stroke:"#d6f5e1","stroke-opacity":.28,"stroke-width":.8,fill:"none"},g)}}
+function line(x1,y1,cx,cy,x2,y2,col,w){el("path",{d:"M"+x1+" "+y1+"Q"+cx+" "+cy+" "+x2+" "+y2,stroke:col,"stroke-width":w,fill:"none","stroke-linecap":"round"},back)}
+/* greenery behind flowers */
+[[-62,215,30],[62,215,30],[-42,255,30],[42,255,30],[-24,275,26],[24,275,26],[-78,185,26],[78,185,26]].forEach(function(l,i){leaf(back,200,428,l[1],l[0],l[2])});
+/* eucalyptus sprigs, lavender, baby's breath */
+var EUC=grad([[0,"#6f9f8c"],[1,"#a7cdbb"]]);
+[[40,150],[360,142],[30,258],[370,252]].forEach(function(e){var x2=e[0],y2=e[1];line(200,430,200+(x2-200)*.4,340,x2,y2,"#5f937c",2.4);
+ for(var i=1;i<6;i++){var t=i/6,px=200+(x2-200)*t*.97,py=430+(y2-430)*t,sd=i%2?1:-1;el("ellipse",{cx:px+sd*8,cy:py,rx:11,ry:6.5,fill:EUC,transform:"rotate("+(sd*-28)+" "+px+" "+py+")"},back)}
+ el("ellipse",{cx:x2,cy:y2,rx:9,ry:5.5,fill:EUC,transform:"rotate(-90 "+x2+" "+y2+")"},back)});
+[[60,184],[340,178]].forEach(function(p){line(200,430,200+(p[0]-200)*.35,345,p[0],p[1],"#5d9a76",2.4);for(var i=0;i<12;i++){var yy=p[1]+i*7;el("ellipse",{cx:p[0]+(i%2?5:-5),cy:yy,rx:4.5,ry:7.5,fill:i%3?"#a58bee":"#8466dd",transform:"rotate("+(i%2?28:-28)+" "+p[0]+" "+yy+")"},back)}});
+[[98,118],[302,120],[170,56],[236,64],[48,226],[352,232],[24,196],[376,190]].forEach(function(p){line(200,430,200+(p[0]-200)*.4,335,p[0],p[1],"#8dbba3",1.3);for(var i=0;i<13;i++){var a=i*2.4,d=4+i*.9;el("circle",{cx:p[0]+Math.cos(a)*d,cy:p[1]+Math.sin(a)*d,r:2.2+(i%3)*.7,fill:i%4?"#fff":"#ffeaf3"},back)}});
+/* flower heads */
+function petalPath(w,h){return "M0 0C"+(-w*1.05)+" "+(-h*.1)+" "+(-w*1.15)+" "+(-h*.85)+" "+(-w*.45)+" "+(-h*.99)+"Q0 "+(-h*1.07)+" "+(w*.45)+" "+(-h*.99)+"C"+(w*1.15)+" "+(-h*.85)+" "+(w*1.05)+" "+(-h*.1)+" 0 0Z"}
+function rose(b,f){var r=f.r,c0=f.c[0],c1=f.c[1];
+ el("circle",{r:r*1.02,fill:mix(c1,"#000",.3)},b);
+ [{n:7,h:1,w:.62,o:0},{n:6,h:.82,w:.54,o:20},{n:5,h:.64,w:.46,o:40},{n:4,h:.46,w:.38,o:15},{n:3,h:.3,w:.3,o:60}].forEach(function(L,i){
+  var col=mix(c0,c1,i*.2),fill=grad([[0,mix(col,"#000",.22)],[.5,col],[1,mix(col,"#fff",.22)]],1);
+  for(var k=0;k<L.n;k++){var ang=k*360/L.n+L.o+(rnd()-.5)*16,hh=r*L.h*(.93+rnd()*.12),ww=r*L.w*(.9+rnd()*.2),g=el("g",{transform:"rotate("+ang+")"},b);
+   el("path",{d:petalPath(ww,hh),fill:fill,stroke:mix(c1,"#000",.4),"stroke-opacity":.4,"stroke-width":.9},g);
+   el("path",{d:"M"+(-ww*.72)+" "+(-hh*.84)+"Q0 "+(-hh*1.08)+" "+(ww*.72)+" "+(-hh*.84),stroke:"#fff","stroke-opacity":.3,"stroke-width":2.4,fill:"none","stroke-linecap":"round"},g)}});
+ el("circle",{r:r*.13,fill:mix(c1,"#000",.35)},b);
+ el("path",{d:"M0 -3c5-6 12-1 9 5c-3 8-15 5-14-4c1-11 17-12 21-1",stroke:mix(c1,"#000",.5),"stroke-width":1.3,fill:"none","stroke-linecap":"round",transform:"scale("+r/50+")"},b);
+ el("circle",{r:r,fill:SHADE},b)}
+function tulip(b,f){var c0=f.c[0],c1=f.c[1];
+ el("path",{d:"M-31 -36C-40 4-26 40 0 43C26 40 40 4 31 -36C17-20-17-20-31 -36Z",fill:mix(c1,"#000",.3)},b);
+ el("path",{d:"M-31 -36C-40 4-26 40 0 43C-6 12-14-16-31 -36Z",fill:grad([[0,c1],[1,mix(c0,c1,.4)]],1)},b);
+ el("path",{d:"M31 -36C40 4 26 40 0 43C6 12 14-16 31 -36Z",fill:grad([[0,c1],[1,mix(c0,c1,.55)]],1)},b);
+ el("path",{d:"M0 -50C-22-24-27 22 0 43C27 22 22-24 0 -50Z",fill:grad([[0,c1],[.5,mix(c0,c1,.3)],[1,c0]],1),stroke:mix(c1,"#000",.3),"stroke-opacity":.35},b);
+ [-9,0,9].forEach(function(x,i){el("path",{d:"M"+x*.6+" -34Q"+x*1.5+" 4 "+x*.5+" 38",stroke:c1,"stroke-opacity":.28,"stroke-width":1.4,fill:"none"},b)});
+ el("path",{d:"M-7 -30Q-12 2-5 28",stroke:"#fff","stroke-opacity":.5,"stroke-width":3.2,fill:"none","stroke-linecap":"round"},b);
+ el("path",{d:"M-8 40Q0 50 8 40L6 46Q0 50 -6 46Z",fill:"#4fae7b"},b)}
+function daisy(b,f){var r=f.r;
+ [[14,.64,.15,0],[14,.54,.13,12.8]].forEach(function(L,i){var fill=grad([[0,i?"#ffe1ee":"#f5cfe0"],[.5,"#fff"],[1,"#fff"]],1);
+  for(var k=0;k<L[0];k++)el("path",{d:"M0 0C"+(-r*L[2]*1.7)+" "+(-r*L[1]*.4)+" "+(-r*L[2]*1.3)+" "+(-r*L[1]*1.0)+" 0 "+(-r*L[1]*1.1)+"C"+(r*L[2]*1.3)+" "+(-r*L[1]*1.0)+" "+(r*L[2]*1.7)+" "+(-r*L[1]*.4)+" 0 0Z",fill:fill,stroke:"#e4bfd2","stroke-opacity":.6,"stroke-width":.8,transform:"rotate("+(k*360/L[0]+L[3])+")"},b)});
+ el("circle",{r:r*.3,fill:grad([[0,"#ffd75a"],[.7,"#f2a91c"],[1,"#c97d0c"]],0,1)},b);
+ for(var i=0;i<14;i++){var a=i*2.4,d=r*.04+i*r*.014;el("circle",{cx:Math.cos(a)*d,cy:Math.sin(a)*d,r:1.1,fill:"#b66f08","fill-opacity":.7},b)}
+ el("circle",{r:r*.3,fill:SHADE},b)}
+var nodes=[],seen={};
+F.forEach(function(f,i){
+ var sy=f.k==="tulip"?36:f.r*.4,mx=(f.x+200)/2+(f.x<200?-16:16),ex=f.x,ey=f.y+sy;
+ el("path",{"class":"stem",d:"M200 430Q"+mx+" 330 "+ex+" "+ey,style:"transition-delay:"+(i*.12)+"s"},stems);
+ var t=.6,px=(1-t)*(1-t)*200+2*(1-t)*t*mx+t*t*ex,py=(1-t)*(1-t)*430+2*(1-t)*t*330+t*t*ey,d=f.x<200?-1:1;
+ if(f.k!=="daisy")leaf(stems,px,py+6,52,d*58,13);
+ if(f.k==="tulip")leaf(stems,px,py+26,92,d*24,12);
+ var g=el("g",{"class":"fl",tabindex:0,role:"button","aria-label":f.t+", tap for a wish"},fl);
+ g.style.transform="translate("+f.x+"px,"+f.y+"px) scale(0) rotate(-40deg)";
+ var bm=el("g",{"class":"bump"},g);bm.style.transformBox="fill-box";bm.style.transformOrigin="center";
+ ({rose:rose,tulip:tulip,daisy:daisy})[f.k](bm,f);
+ function pick(){showWish(i,g)}
+ g.addEventListener("click",pick);
+ g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick()}});
+ nodes.push(g)});
+var wishEl=document.getElementById("wish"),cnt=document.getElementById("count"),fin=document.getElementById("final");
+function showWish(i,g){var f=F[i];wishEl.innerHTML="";var b=document.createElement("b");b.textContent=f.t;wishEl.appendChild(b);wishEl.appendChild(document.createTextNode(f.w));
+ g.classList.add("pop");setTimeout(function(){g.classList.remove("pop")},400);
+ seen[i]=1;var n=Object.keys(seen).length;cnt.textContent=n<F.length?n+" of "+F.length+" wishes opened":"All seven wishes opened";
+ if(n===F.length){fin.classList.add("on");rain(36)}else rain(6)}
+function rain(n){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ var cols=["#ff9bbd","#ffd0a8","#e3ccff","#ffc2d9","#fff2b0"];
+ for(var i=0;i<n;i++){var p=document.createElement("i");p.className="petal";p.style.left=Math.random()*100+"vw";p.style.background=cols[i%cols.length];
+  p.style.setProperty("--dx",(Math.random()*160-80)+"px");p.style.animationDuration=(5+Math.random()*5)+"s";p.style.animationDelay=(Math.random()*1.5)+"s";
+  document.body.appendChild(p);setTimeout(function(q){q.remove()}.bind(null,p),12000)}}
+document.getElementById("open").addEventListener("click",function(){this.classList.add("hide");
+ document.getElementById("stage").classList.add("bloomed");document.getElementById("wrap").style.opacity=1;
+ nodes.forEach(function(g,i){var f=F[i];setTimeout(function(){g.style.transform="translate("+f.x+"px,"+f.y+"px) scale(1) rotate("+f.tilt+"deg)"},500+i*220)});
+ setTimeout(function(){document.getElementById("bq").classList.add("sway")},2600);rain(18)});
+document.getElementById("share").addEventListener("click",function(){
+ var d={title:"A bouquet for you",text:"I made you a digital bouquet. Tap the flowers.",url:location.href.split("#")[0]};
+ if(navigator.share){navigator.share(d).catch(function(){})}
+ else if(navigator.clipboard){navigator.clipboard.writeText(d.url).then(function(){document.getElementById("share").textContent="Link copied"}).catch(function(){})}});
+})();
+</script>
+</body>
+</html>
